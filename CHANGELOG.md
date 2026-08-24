@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.1.0-beta.2 - 2026-08-24
+
 - Map remote 401/403 authentication and authorization failures to a clear
   `access_denied` response instead of a generic storage error.
 - Report `NoSuchBucket` as `remote_bucket_not_found` instead of incorrectly
