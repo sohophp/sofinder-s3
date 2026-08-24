@@ -42,7 +42,12 @@ The AWS default credential provider chain is used unless `access_key_id` and
 `secret_access_key` are both supplied through environment-backed configuration.
 Never commit credentials. Private resources should use proxy delivery. A public
 resource may configure `public_url` as the CDN or bucket URL corresponding to
-the configured root.
+the configured root. Set `delivery_mode: public` to expose that URL in browser
+entries, copied links and editor selections. The adapter appends the logical
+object path, so a resource rooted at `component-images` should use a base such
+as `https://cdn.example.com/component-images`. Keep `delivery_mode: proxy` and
+`public_url: ''` for private objects that must remain behind SoFinder's
+authenticated content endpoint.
 
 S3 deletion is permanent from SoFinder's perspective. Enable bucket versioning
 or provider lifecycle protection when recovery is required.
