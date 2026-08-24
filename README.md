@@ -76,11 +76,14 @@ vendor/bin/phpunit --filter S3ProviderSmokeTest
 ```
 
 The test does not create a bucket. It writes only beneath a random
-`provider-smoke/<random>` prefix, checks Unicode stream CRUD, listing, copy,
-move, usage, permanent deletion and adapter audit, then performs best-effort
-cleanup. Keep `SOFINDER_PROVIDER_USE_PATH_STYLE_ENDPOINT` unset for B2. If the
-application key is restricted to one bucket, enable B2's list-all-bucket-names
-permission for SDK compatibility. B2 buckets are always versioned, so final
-cleanup lists versions only inside the random prefix and deletes them by
-version ID. The application key therefore needs list/read/write/delete access;
-configure an appropriate lifecycle rule as a fallback for retained versions.
+`<SOFINDER_PROVIDER_PREFIX>/provider-smoke/<random>` prefix, checks Unicode
+stream CRUD, listing, copy, move, usage, permanent deletion and adapter audit,
+then performs best-effort cleanup. Set `SOFINDER_PROVIDER_PREFIX` to the same
+prefix allowed by a prefix-restricted application key; leave it empty only for
+a bucket-wide key. Keep `SOFINDER_PROVIDER_USE_PATH_STYLE_ENDPOINT` unset for
+B2. If the application key is restricted to one bucket, enable B2's
+list-all-bucket-names permission for SDK compatibility. B2 buckets are always
+versioned, so final cleanup lists versions only inside the random prefix and
+deletes them by version ID. The application key therefore needs
+list/read/write/delete access; configure an appropriate lifecycle rule as a
+fallback for retained versions.

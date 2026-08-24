@@ -29,7 +29,9 @@ final class S3ProviderSmokeTest extends TestCase
         self::assertNotNull($accessKey);
         self::assertNotNull($secretKey);
 
-        $root = 'provider-smoke/'.bin2hex(random_bytes(8));
+        $configuredPrefix = trim((string) getenv('SOFINDER_PROVIDER_PREFIX'), '/');
+        $root = ($configuredPrefix === '' ? '' : $configuredPrefix.'/')
+            .'provider-smoke/'.bin2hex(random_bytes(8));
         $resource = new ResourceType('ProviderSmoke', $root, '', ['txt'], maxRecursiveItems: 100);
         $pathStyle = $this->environmentFlag('SOFINDER_PROVIDER_USE_PATH_STYLE_ENDPOINT');
         $sessionToken = (string) (getenv('SOFINDER_PROVIDER_SESSION_TOKEN') ?: '');
