@@ -55,6 +55,9 @@ final readonly class S3StorageAdapter implements StorageAdapterInterface, Storag
                 if ($object['key'] === $directoryPrefix) {
                     continue;
                 }
+                if ($this->isProviderFolderMarker($object['key'])) {
+                    continue;
+                }
                 if (str_ends_with($object['key'], '/')) {
                     $logical = $this->logicalPath(rtrim($object['key'], '/'));
                     if ($logical !== '') {
@@ -338,6 +341,19 @@ final readonly class S3StorageAdapter implements StorageAdapterInterface, Storag
             throw new SoFinderException('The S3 service returned an object outside the configured root.', 'remote_storage_error', 502);
         }
         return $this->paths->normalize(substr($key, strlen($prefix)));
+    }
+
+    private function isProviderFolderMarker(string $key): bool
+    {
+        if ($this->prefix !== '') {
+            $prefix = $this->prefix . '/';
+            if (!str_starts_with($key, $prefix)) {
+                return false;
+            }
+            $key = substr($key, strlen($prefix));
+        }
+
+        return basename($key) === '.bzEmpty';
     }
 
     /** @param resource $stream */

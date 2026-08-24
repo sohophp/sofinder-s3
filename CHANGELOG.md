@@ -6,6 +6,8 @@
   `access_denied` response instead of a generic storage error.
 - Report `NoSuchBucket` as `remote_bucket_not_found` instead of incorrectly
   treating it as a missing file or folder.
+- Hide Backblaze `.bzEmpty` provider markers instead of rejecting an otherwise
+  empty prefix as an invalid user path.
 
 - Add a dotenv-backed external provider smoke contract with prefix isolation
   and version-aware cleanup.

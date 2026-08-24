@@ -103,6 +103,17 @@ final class S3StorageAdapterTest extends TestCase
         }
         self::assertSame([], array_values(array_filter($gateway->keys(), static fn (string $key): bool => str_starts_with($key, 'destination/'))));
     }
+
+    public function testBackblazeEmptyFolderMarkersAreHiddenFromListings(): void
+    {
+        $gateway = new MemoryS3Gateway();
+        $gateway->seed('component-images/.bzEmpty');
+        $adapter = new S3StorageAdapter($gateway, 'component-images');
+
+        $page = $adapter->list(new ListQuery(''));
+
+        self::assertSame([], $page->entries);
+    }
 }
 
 final class MemoryS3Gateway implements S3GatewayInterface
@@ -198,6 +209,11 @@ final class MemoryS3Gateway implements S3GatewayInterface
         if (!$this->bucketAvailable) {
             throw new \RuntimeException('secret gateway diagnostic');
         }
+    }
+
+    public function seed(string $key, string $body = ''): void
+    {
+        $this->objects[$key] = ['body' => $body, 'mimeType' => 'application/octet-stream', 'modifiedAt' => time()];
     }
 
     /** @return list<string> */
