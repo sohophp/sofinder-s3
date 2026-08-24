@@ -55,3 +55,34 @@ or provider lifecycle protection when recovery is required.
 | Cloudflare R2 | Supported | Use the account endpoint and `region: auto`. |
 | MinIO | CI verified | Use path-style URLs; allow HTTP only on a trusted development network. |
 | DigitalOcean Spaces, Wasabi, Backblaze B2 | Compatible candidates | Use their S3 endpoint; treat as unverified until the contract suite passes in your environment. |
+
+## Backblaze B2 smoke test
+
+Backblaze B2 can be tested directly from this repository; Winstar is not
+required. Use an existing non-production bucket and a manually created B2
+application key. The key ID is the access key ID, and the application key is
+the secret access key. Do not use the master application key or commit values
+to this repository.
+
+Provide the following variables through the process environment, then run the
+single external test. The prompt keeps the application key out of shell
+history and command arguments:
+
+```bash
+cd packages/sofinder-s3
+export SOFINDER_PROVIDER_REGION=your-b2-region
+export SOFINDER_PROVIDER_ENDPOINT=https://s3.${SOFINDER_PROVIDER_REGION}.backblazeb2.com
+export SOFINDER_PROVIDER_BUCKET=your-non-production-test-bucket
+read -r -p 'B2 application key ID: ' SOFINDER_PROVIDER_ACCESS_KEY
+read -r -s -p 'B2 application key: ' SOFINDER_PROVIDER_SECRET_KEY; echo
+export SOFINDER_PROVIDER_ACCESS_KEY SOFINDER_PROVIDER_SECRET_KEY
+vendor/bin/phpunit --filter S3ProviderSmokeTest
+unset SOFINDER_PROVIDER_ACCESS_KEY SOFINDER_PROVIDER_SECRET_KEY
+```
+
+The test does not create a bucket. It writes only beneath a random
+`provider-smoke/<random>` prefix, checks Unicode stream CRUD, listing, copy,
+move, usage, permanent deletion and adapter audit, then performs best-effort
+cleanup. Keep `SOFINDER_PROVIDER_USE_PATH_STYLE_ENDPOINT` unset for B2. If the
+application key is restricted to one bucket, enable B2's list-all-bucket-names
+permission for SDK compatibility.
