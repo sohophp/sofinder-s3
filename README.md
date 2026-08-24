@@ -54,7 +54,8 @@ or provider lifecycle protection when recovery is required.
 | AWS S3 | Supported | Omit the custom endpoint. |
 | Cloudflare R2 | Supported | Use the account endpoint and `region: auto`. |
 | MinIO | CI verified | Use path-style URLs; allow HTTP only on a trusted development network. |
-| DigitalOcean Spaces, Wasabi, Backblaze B2 | Compatible candidates | Use their S3 endpoint; treat as unverified until the contract suite passes in your environment. |
+| Backblaze B2 | Contract verified | Use its regional HTTPS endpoint; conditional Put Object is disabled automatically. |
+| DigitalOcean Spaces, Wasabi | Compatible candidates | Use their S3 endpoint; treat as unverified until the contract suite passes in your environment. |
 
 ## Backblaze B2 smoke test
 
@@ -87,3 +88,10 @@ versioned, so final cleanup lists versions only inside the random prefix and
 deletes them by version ID. The application key therefore needs
 list/read/write/delete access; configure an appropriate lifecycle rule as a
 fallback for retained versions.
+
+Backblaze B2 does not implement `If-None-Match` for Put Object. The adapter
+recognizes `*.backblazeb2.com` endpoints and omits that conditional header
+after performing its normal existence check. AWS S3 and MinIO retain atomic
+conditional creation. Other compatible providers can set
+`options.conditional_writes: false` explicitly when they have the same API
+limitation; disabling it introduces a small concurrent-create race window.

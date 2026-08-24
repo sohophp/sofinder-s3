@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+- Add a dotenv-backed external provider smoke contract with prefix isolation
+  and version-aware cleanup.
+- Verify Backblaze B2 CRUD compatibility and automatically omit the unsupported
+  `If-None-Match` Put Object header for `*.backblazeb2.com` endpoints.
+- Allow other S3-compatible providers to disable conditional writes explicitly.
+
 ## 0.1.0-beta.1 - 2026-08-24
 
 - Add the explicit `s3` SoFinder storage factory backed by AWS SDK for PHP v3.

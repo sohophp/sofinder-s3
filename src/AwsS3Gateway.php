@@ -12,8 +12,11 @@ use SohoPHP\SoFinder\Exception\SoFinderException;
 
 final readonly class AwsS3Gateway implements S3GatewayInterface
 {
-    public function __construct(private S3Client $client, private string $bucket)
-    {
+    public function __construct(
+        private S3Client $client,
+        private string $bucket,
+        private bool $conditionalWrites = true,
+    ) {
     }
 
     public function list(string $prefix, ?string $delimiter = null, ?string $token = null, int $limit = 1000): array
@@ -65,7 +68,7 @@ final readonly class AwsS3Gateway implements S3GatewayInterface
     {
         try {
             $arguments = ['Bucket' => $this->bucket, 'Key' => $key, 'Body' => $stream, 'ContentType' => $mimeType];
-            if (!$overwrite) {
+            if (!$overwrite && $this->conditionalWrites) {
                 $arguments['IfNoneMatch'] = '*';
             }
             $this->client->putObject($arguments);

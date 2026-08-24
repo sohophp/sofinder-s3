@@ -56,8 +56,18 @@ final class S3StorageAdapterFactory implements StorageAdapterFactoryInterface
         if ($accessKey !== '') {
             $clientOptions['credentials'] = new Credentials($accessKey, $secretKey, ($options['session_token'] ?? '') !== '' ? (string) $options['session_token'] : null);
         }
-        $gateway = new AwsS3Gateway(new S3Client($clientOptions), $bucket);
+        $conditionalWrites = array_key_exists('conditional_writes', $options)
+            ? (bool) $options['conditional_writes']
+            : !$this->isBackblazeEndpoint($endpoint);
+        $gateway = new AwsS3Gateway(new S3Client($clientOptions), $bucket, $conditionalWrites);
 
         return new S3StorageAdapter($gateway, $resource->root, $resource->publicUrl, $resource->maxRecursiveItems, $secureEndpoint);
+    }
+
+    private function isBackblazeEndpoint(string $endpoint): bool
+    {
+        $host = strtolower((string) (parse_url($endpoint, PHP_URL_HOST) ?: ''));
+
+        return $host === 'backblazeb2.com' || str_ends_with($host, '.backblazeb2.com');
     }
 }
