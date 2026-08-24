@@ -6,14 +6,18 @@ namespace SohoPHP\SoFinderS3;
 
 use Aws\Exception\AwsException;
 use Aws\S3\S3Client;
+use SohoPHP\SoFinder\Exception\AccessDeniedException;
 use SohoPHP\SoFinder\Exception\ConflictException;
 use SohoPHP\SoFinder\Exception\NotFoundException;
 use SohoPHP\SoFinder\Exception\SoFinderException;
 
 final readonly class AwsS3Gateway implements S3GatewayInterface
 {
-    public function __construct(private S3Client $client, private string $bucket)
-    {
+    public function __construct(
+        private S3Client $client,
+        private string $bucket,
+        private bool $conditionalWrites = true,
+    ) {
     }
 
     public function list(string $prefix, ?string $delimiter = null, ?string $token = null, int $limit = 1000): array
@@ -65,7 +69,7 @@ final readonly class AwsS3Gateway implements S3GatewayInterface
     {
         try {
             $arguments = ['Bucket' => $this->bucket, 'Key' => $key, 'Body' => $stream, 'ContentType' => $mimeType];
-            if (!$overwrite) {
+            if (!$overwrite && $this->conditionalWrites) {
                 $arguments['IfNoneMatch'] = '*';
             }
             $this->client->putObject($arguments);
@@ -145,8 +149,14 @@ final readonly class AwsS3Gateway implements S3GatewayInterface
     {
         $status = $this->status($exception);
         $code = (string) $exception->getAwsErrorCode();
+        if ($code === 'NoSuchBucket') {
+            return new SoFinderException('The configured remote object storage bucket was not found or is unavailable.', 'remote_bucket_not_found', 502, $exception);
+        }
         if ($status === 404 || in_array($code, ['NoSuchKey', 'NotFound'], true)) {
             return new NotFoundException();
+        }
+        if (in_array($status, [401, 403], true) || in_array($code, ['AccessDenied', 'InvalidAccessKeyId', 'SignatureDoesNotMatch'], true)) {
+            return new AccessDeniedException('The remote object storage credentials do not allow this operation.');
         }
         if (in_array($status, [409, 412], true) || in_array($code, ['BucketAlreadyExists', 'ConditionalRequestConflict', 'PreconditionFailed'], true)) {
             return new ConflictException();

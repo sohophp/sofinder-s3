@@ -1,5 +1,22 @@
 # Changelog
 
+## Unreleased
+
+## 0.1.0-beta.2 - 2026-08-24
+
+- Map remote 401/403 authentication and authorization failures to a clear
+  `access_denied` response instead of a generic storage error.
+- Report `NoSuchBucket` as `remote_bucket_not_found` instead of incorrectly
+  treating it as a missing file or folder.
+- Hide Backblaze `.bzEmpty` provider markers instead of rejecting an otherwise
+  empty prefix as an invalid user path.
+
+- Add a dotenv-backed external provider smoke contract with prefix isolation
+  and version-aware cleanup.
+- Verify Backblaze B2 CRUD compatibility and automatically omit the unsupported
+  `If-None-Match` Put Object header for `*.backblazeb2.com` endpoints.
+- Allow other S3-compatible providers to disable conditional writes explicitly.
+
 ## 0.1.0-beta.1 - 2026-08-24
 
 - Add the explicit `s3` SoFinder storage factory backed by AWS SDK for PHP v3.
