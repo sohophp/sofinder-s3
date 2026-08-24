@@ -64,20 +64,15 @@ application key. The key ID is the access key ID, and the application key is
 the secret access key. Do not use the master application key or commit values
 to this repository.
 
-Provide the following variables through the process environment, then run the
-single external test. The prompt keeps the application key out of shell
-history and command arguments:
+Copy the safe template once, fill `.env.local`, then run the single external
+test. Symfony Dotenv loads this file automatically for the test process;
+`.env.local` is ignored by Git and must never be committed:
 
 ```bash
 cd packages/sofinder-s3
-export SOFINDER_PROVIDER_REGION=your-b2-region
-export SOFINDER_PROVIDER_ENDPOINT=https://s3.${SOFINDER_PROVIDER_REGION}.backblazeb2.com
-export SOFINDER_PROVIDER_BUCKET=your-non-production-test-bucket
-read -r -p 'B2 application key ID: ' SOFINDER_PROVIDER_ACCESS_KEY
-read -r -s -p 'B2 application key: ' SOFINDER_PROVIDER_SECRET_KEY; echo
-export SOFINDER_PROVIDER_ACCESS_KEY SOFINDER_PROVIDER_SECRET_KEY
+cp .env.example .env.local
+# Edit .env.local with the B2 endpoint, region, test bucket and application key.
 vendor/bin/phpunit --filter S3ProviderSmokeTest
-unset SOFINDER_PROVIDER_ACCESS_KEY SOFINDER_PROVIDER_SECRET_KEY
 ```
 
 The test does not create a bucket. It writes only beneath a random
