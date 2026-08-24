@@ -14,6 +14,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\RequestInterface;
 use SohoPHP\SoFinder\Exception\AccessDeniedException;
+use SohoPHP\SoFinder\Exception\SoFinderException;
 use SohoPHP\SoFinderS3\AwsS3Gateway;
 
 final class AwsS3GatewayTest extends TestCase
@@ -69,5 +70,30 @@ final class AwsS3GatewayTest extends TestCase
         $this->expectExceptionMessage('The remote object storage credentials do not allow this operation.');
 
         (new AwsS3Gateway($client, 'bucket'))->list('component-images/');
+    }
+
+    public function testMissingBucketIsNotReportedAsAMissingEntry(): void
+    {
+        $handler = new MockHandler();
+        $client = new S3Client([
+            'version' => 'latest',
+            'region' => 'us-east-1',
+            'handler' => $handler,
+            'credentials' => ['key' => 'test', 'secret' => 'test'],
+        ]);
+        $command = $client->getCommand('ListObjectsV2', ['Bucket' => 'missing']);
+        $handler->append(new AwsException('Missing bucket', $command, [
+            'code' => 'NoSuchBucket',
+            'response' => new Response(404),
+        ]));
+
+        try {
+            (new AwsS3Gateway($client, 'missing'))->list('component-images/');
+            self::fail('Expected the missing bucket error to be translated.');
+        } catch (SoFinderException $exception) {
+            self::assertSame('remote_bucket_not_found', $exception->errorCode);
+            self::assertSame(502, $exception->httpStatus);
+            self::assertSame('The configured remote object storage bucket was not found or is unavailable.', $exception->getMessage());
+        }
     }
 }

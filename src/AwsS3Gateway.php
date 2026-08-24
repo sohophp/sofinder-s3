@@ -149,6 +149,9 @@ final readonly class AwsS3Gateway implements S3GatewayInterface
     {
         $status = $this->status($exception);
         $code = (string) $exception->getAwsErrorCode();
+        if ($code === 'NoSuchBucket') {
+            return new SoFinderException('The configured remote object storage bucket was not found or is unavailable.', 'remote_bucket_not_found', 502, $exception);
+        }
         if ($status === 404 || in_array($code, ['NoSuchKey', 'NotFound'], true)) {
             return new NotFoundException();
         }
