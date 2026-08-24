@@ -65,12 +65,15 @@ final class S3MinioIntegrationTest extends TestCase
             }
         })();
         (new CommandPool($client, $commands, ['concurrency' => 32]))->promise()->wait();
-        $first = $adapter->list(new ListQuery('bulk', limit: 600));
-        self::assertCount(600, $first->entries);
+        $first = $adapter->list(new ListQuery('bulk', limit: 500));
+        self::assertCount(500, $first->entries);
         self::assertNotNull($first->nextCursor);
-        $second = $adapter->list(new ListQuery('bulk', offset: 600, limit: 600, cursor: $first->nextCursor));
-        self::assertCount(401, $second->entries);
-        self::assertNull($second->nextCursor);
+        $second = $adapter->list(new ListQuery('bulk', offset: 500, limit: 500, cursor: $first->nextCursor));
+        self::assertCount(500, $second->entries);
+        self::assertNotNull($second->nextCursor);
+        $third = $adapter->list(new ListQuery('bulk', offset: 1_000, limit: 500, cursor: $second->nextCursor));
+        self::assertCount(1, $third->entries);
+        self::assertNull($third->nextCursor);
 
         $adapter->delete('资料');
         $adapter->delete('moved');
