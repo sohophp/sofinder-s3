@@ -6,6 +6,7 @@ namespace SohoPHP\SoFinderS3;
 
 use Aws\Exception\AwsException;
 use Aws\S3\S3Client;
+use SohoPHP\SoFinder\Exception\AccessDeniedException;
 use SohoPHP\SoFinder\Exception\ConflictException;
 use SohoPHP\SoFinder\Exception\NotFoundException;
 use SohoPHP\SoFinder\Exception\SoFinderException;
@@ -150,6 +151,9 @@ final readonly class AwsS3Gateway implements S3GatewayInterface
         $code = (string) $exception->getAwsErrorCode();
         if ($status === 404 || in_array($code, ['NoSuchKey', 'NotFound'], true)) {
             return new NotFoundException();
+        }
+        if (in_array($status, [401, 403], true) || in_array($code, ['AccessDenied', 'InvalidAccessKeyId', 'SignatureDoesNotMatch'], true)) {
+            return new AccessDeniedException('The remote object storage credentials do not allow this operation.');
         }
         if (in_array($status, [409, 412], true) || in_array($code, ['BucketAlreadyExists', 'ConditionalRequestConflict', 'PreconditionFailed'], true)) {
             return new ConflictException();

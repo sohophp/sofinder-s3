@@ -5,12 +5,15 @@ declare(strict_types=1);
 namespace SohoPHP\SoFinderS3\Tests;
 
 use Aws\CommandInterface;
+use Aws\Exception\AwsException;
 use Aws\MockHandler;
 use Aws\Result;
 use Aws\S3\S3Client;
+use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\RequestInterface;
+use SohoPHP\SoFinder\Exception\AccessDeniedException;
 use SohoPHP\SoFinderS3\AwsS3Gateway;
 
 final class AwsS3GatewayTest extends TestCase
@@ -45,5 +48,26 @@ final class AwsS3GatewayTest extends TestCase
     {
         yield 'AWS default' => [true, true];
         yield 'B2-compatible fallback' => [false, false];
+    }
+
+    public function testAccessDeniedIsMappedToAUsefulStoragePermissionError(): void
+    {
+        $handler = new MockHandler();
+        $client = new S3Client([
+            'version' => 'latest',
+            'region' => 'us-east-1',
+            'handler' => $handler,
+            'credentials' => ['key' => 'test', 'secret' => 'test'],
+        ]);
+        $command = $client->getCommand('ListObjectsV2', ['Bucket' => 'bucket']);
+        $handler->append(new AwsException('Forbidden', $command, [
+            'code' => 'AccessDenied',
+            'response' => new Response(403),
+        ]));
+
+        $this->expectException(AccessDeniedException::class);
+        $this->expectExceptionMessage('The remote object storage credentials do not allow this operation.');
+
+        (new AwsS3Gateway($client, 'bucket'))->list('component-images/');
     }
 }

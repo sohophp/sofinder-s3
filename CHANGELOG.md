@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Map remote 401/403 authentication and authorization failures to a clear
+  `access_denied` response instead of a generic storage error.
+
 - Add a dotenv-backed external provider smoke contract with prefix isolation
   and version-aware cleanup.
 - Verify Backblaze B2 CRUD compatibility and automatically omit the unsupported
