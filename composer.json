@@ -1,0 +1,38 @@
+{
+    "name": "sohophp/sofinder-s3",
+    "description": "S3-compatible object storage adapter for SoFinder",
+    "type": "symfony-bundle",
+    "license": "MIT",
+    "homepage": "https://github.com/sohophp/sofinder-s3",
+    "keywords": ["sofinder", "s3", "object-storage", "cloudflare-r2", "minio"],
+    "support": {
+        "issues": "https://github.com/sohophp/sofinder-s3/issues",
+        "source": "https://github.com/sohophp/sofinder-s3"
+    },
+    "require": {
+        "php": "^8.2",
+        "aws/aws-sdk-php": "^3.356",
+        "sohophp/sofinder": "^0.1.0-beta.7"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^11.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "SohoPHP\\SoFinderS3\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "SohoPHP\\SoFinderS3\\Tests\\": "tests/"
+        }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-main": "0.1.x-dev"
+        }
+    }
+}
