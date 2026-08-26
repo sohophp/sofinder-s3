@@ -81,6 +81,18 @@ final class S3StorageAdapterTest extends TestCase
         self::assertStringNotContainsString('secret', implode(' ', array_column($findings, 'message')));
     }
 
+    public function testStorageHealthProbeChecksTheBucket(): void
+    {
+        $gateway = new MemoryS3Gateway();
+        $adapter = new S3StorageAdapter($gateway, '/');
+        $adapter->checkStorage();
+        self::assertSame(1, $gateway->bucketCheckCount);
+
+        $gateway->bucketAvailable = false;
+        $this->expectException(\RuntimeException::class);
+        $adapter->checkStorage();
+    }
+
     public function testRecursiveOperationsRespectTheConfiguredObjectLimit(): void
     {
         $gateway = new MemoryS3Gateway();
@@ -122,6 +134,7 @@ final class MemoryS3Gateway implements S3GatewayInterface
     private array $objects = [];
     public ?int $failCopyAt = null;
     public bool $bucketAvailable = true;
+    public int $bucketCheckCount = 0;
     private int $copyCount = 0;
 
     public function list(string $prefix, ?string $delimiter = null, ?string $token = null, int $limit = 1000): array
@@ -206,6 +219,7 @@ final class MemoryS3Gateway implements S3GatewayInterface
 
     public function checkBucket(): void
     {
+        ++$this->bucketCheckCount;
         if (!$this->bucketAvailable) {
             throw new \RuntimeException('secret gateway diagnostic');
         }

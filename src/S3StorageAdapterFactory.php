@@ -44,6 +44,10 @@ final class S3StorageAdapterFactory implements StorageAdapterFactoryInterface
             'use_path_style_endpoint' => (bool) ($options['use_path_style_endpoint'] ?? false),
             'request_checksum_calculation' => 'when_required',
             'response_checksum_validation' => 'when_required',
+            'http' => [
+                'connect_timeout' => $this->healthTimeout($options),
+                'timeout' => $this->healthTimeout($options),
+            ],
         ];
         if ($endpoint !== '') {
             $clientOptions['endpoint'] = rtrim($endpoint, '/');
@@ -69,5 +73,16 @@ final class S3StorageAdapterFactory implements StorageAdapterFactoryInterface
         $host = strtolower((string) (parse_url($endpoint, PHP_URL_HOST) ?: ''));
 
         return $host === 'backblazeb2.com' || str_ends_with($host, '.backblazeb2.com');
+    }
+
+    /** @param array<string, mixed> $options */
+    private function healthTimeout(array $options): float
+    {
+        $timeout = (float) ($options['health_timeout_seconds'] ?? 5.0);
+        if ($timeout < 0.1 || $timeout > 30.0) {
+            throw new \InvalidArgumentException('S3 health_timeout_seconds must be between 0.1 and 30 seconds.');
+        }
+
+        return $timeout;
     }
 }

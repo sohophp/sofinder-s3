@@ -31,12 +31,15 @@ so_finder:
         region: '%env(SOFINDER_S3_REGION)%'
         endpoint: '%env(SOFINDER_S3_ENDPOINT)%'
         use_path_style_endpoint: false
+        health_timeout_seconds: 5
 ```
 
 Omit `endpoint` for AWS S3. Use `region: auto` plus the account endpoint for
 Cloudflare R2. MinIO normally requires `use_path_style_endpoint: true`; HTTP is
 rejected unless `allow_insecure_endpoint: true` is explicitly set for a trusted
 development network. Set `root: /` to expose the bucket root.
+`health_timeout_seconds` bounds the `/health` bucket probe between 0.1 and 30
+seconds; it also limits the S3 client's connect and request timeouts.
 
 The AWS default credential provider chain is used unless `access_key_id` and
 `secret_access_key` are both supplied through environment-backed configuration.

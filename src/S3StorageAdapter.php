@@ -7,6 +7,7 @@ namespace SohoPHP\SoFinderS3;
 use SohoPHP\SoFinder\Contract\StorageAdapterInterface;
 use SohoPHP\SoFinder\Contract\StorageAuditProviderInterface;
 use SohoPHP\SoFinder\Contract\StorageUsageProviderInterface;
+use SohoPHP\SoFinder\Contract\StorageHealthProbeInterface;
 use SohoPHP\SoFinder\Exception\ConflictException;
 use SohoPHP\SoFinder\Exception\NotFoundException;
 use SohoPHP\SoFinder\Exception\SoFinderException;
@@ -16,7 +17,7 @@ use SohoPHP\SoFinder\Value\ListQuery;
 use SohoPHP\SoFinder\Value\ListingPage;
 use SohoPHP\SoFinder\Value\StorageCapabilities;
 
-final readonly class S3StorageAdapter implements StorageAdapterInterface, StorageUsageProviderInterface, StorageAuditProviderInterface
+final readonly class S3StorageAdapter implements StorageAdapterInterface, StorageUsageProviderInterface, StorageAuditProviderInterface, StorageHealthProbeInterface
 {
     private string $prefix;
 
@@ -85,6 +86,11 @@ final readonly class S3StorageAdapter implements StorageAdapterInterface, Storag
     public function capabilities(): StorageCapabilities
     {
         return new StorageCapabilities(search: false, sort: false, cursorPagination: true, atomicMove: false, nativeCopy: true, recoverableDelete: false, publicUrl: $this->baseUrl !== '');
+    }
+
+    public function checkStorage(): void
+    {
+        $this->gateway->checkBucket();
     }
 
     public function entry(string $path): Entry
