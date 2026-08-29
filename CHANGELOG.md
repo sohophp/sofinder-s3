@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+## 1.0.2 - 2026-08-30
+
+- Synchronize the immutable package version with the PHP 8 stable release;
+  there are no S3 adapter runtime changes in this patch.
+
 ## 1.0.1 - 2026-08-29
 
 - Make the package a framework-neutral Core adapter library. Symfony Bundle and
