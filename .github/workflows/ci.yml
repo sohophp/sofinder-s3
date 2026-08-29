@@ -1,24 +1,53 @@
-name: CI
+name: Package CI
 
 on:
   push:
     branches: [main]
+    tags: ['v*']
   pull_request:
+
+permissions:
+  contents: read
+
+env:
+  PHP_BIN: php
 
 jobs:
   test:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - php: '8.2'
+            preference: --prefer-lowest
+          - php: '8.5'
+            preference: --prefer-stable
     steps:
-      - uses: actions/checkout@v5
-      - uses: shivammathur/setup-php@v2
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2
         with:
-          php-version: '8.5'
+          php-version: ${{ matrix.php }}
           coverage: none
-      - run: composer validate --strict
-      - run: composer install --no-interaction --prefer-dist
-      - run: docker run -d --name sofinder-minio -p 9000:9000 -e MINIO_ROOT_USER=minioadmin -e MINIO_ROOT_PASSWORD=minioadmin minio/minio:latest server /data
+      - name: Select synchronized root version
+        run: |
+          if [[ "$GITHUB_REF_TYPE" == tag ]]; then
+            echo "COMPOSER_ROOT_VERSION=${GITHUB_REF_NAME#v}" >> "$GITHUB_ENV"
+          else
+            echo 'COMPOSER_ROOT_VERSION=dev-main' >> "$GITHUB_ENV"
+          fi
+      - run: ./scripts/composer.sh validate --strict
+      - name: Configure synchronized Core source
+        run: |
+          ./scripts/composer.sh config minimum-stability dev
+          ./scripts/composer.sh config prefer-stable true
+          ./scripts/composer.sh config repositories.core '{"type":"vcs","url":"https://github.com/sohophp/sofinder-core.git"}'
+      - run: ./scripts/composer.sh update --no-interaction --prefer-dist ${{ matrix.preference }}
+      - run: ./scripts/composer.sh audit
+      - run: find src tests -type f -name '*.php' -print0 | xargs -0 -n1 ./scripts/php-bin.sh -l
+      - run: docker run -d --name sofinder-minio -p 9000:9000 -e MINIO_ROOT_USER=minioadmin -e MINIO_ROOT_PASSWORD=minioadmin minio/minio@sha256:d249d1fb6966de4d8ad26c04754b545205ff15a62e4fd19ebd0f26fa5baacbc0 server /data
       - run: for attempt in {1..30}; do curl --fail --silent http://127.0.0.1:9000/minio/health/ready && exit 0; sleep 1; done; exit 1
-      - run: vendor/bin/phpunit
+      - run: ./scripts/php-bin.sh vendor/bin/phpunit
         env:
           SOFINDER_S3_ENDPOINT: http://127.0.0.1:9000
           SOFINDER_S3_BUCKET: sofinder-test
