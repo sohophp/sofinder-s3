@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+## 1.1.0 - 2026-08-30
+
+- Synchronize the package version with the PHP 8 multi-framework release;
+  there are no S3 adapter runtime changes in this minor release.
+
 ## 1.0.2 - 2026-08-30
 
 - Synchronize the immutable package version with the PHP 8 stable release;
