@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 1.1.1 - 2026-08-30
+
+- Synchronize the package version with the PHP 8 patch release; the S3 adapter
+  runtime is unchanged, while the Symfony example now keeps same-origin
+  application-owned entry URLs relative.
+
 ## 1.1.0 - 2026-08-30
 
 - Synchronize the package version with the PHP 8 multi-framework release;
