@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Make the package a framework-neutral Core adapter library. Symfony Bundle and
+  dependency-injection integration now ship from `sohophp/sofinder-symfony`
+  under the existing class names.
+
 ## 0.1.0-beta.2 - 2026-08-24
 
 - Map remote 401/403 authentication and authorization failures to a clear

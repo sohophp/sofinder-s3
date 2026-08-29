@@ -1,13 +1,16 @@
 # SoFinder S3 adapter
 
-This optional bundle adds an `s3` storage adapter to SoFinder through AWS SDK
-for PHP v3.
+This optional framework-neutral library adds an `s3` storage adapter to
+SoFinder through AWS SDK for PHP v3. Installing it by itself does not install
+Symfony or another full-stack framework.
 
 ```bash
-composer require sohophp/sofinder-s3:^0.1@beta
+composer require sohophp/sofinder-s3:^1.0
 ```
 
-Register `SoFinderS3Bundle` after `SoFinderBundle` in `config/bundles.php`:
+Symfony applications also need `sohophp/sofinder-symfony` (or the compatible
+`sohophp/sofinder` meta package). The Symfony bridge supplies the optional
+`SoFinderS3Bundle`; register it after `SoFinderBundle` in `config/bundles.php`:
 
 ```php
 return [
@@ -15,6 +18,10 @@ return [
     SohoPHP\SoFinderS3\SoFinderS3Bundle::class => ['all' => true],
 ];
 ```
+
+Headless applications can instantiate `S3StorageAdapterFactory` directly and
+register it through Core's `StorageAdapterFactoryInterface` contract. They do
+not need or receive the Symfony Bundle and dependency-injection extension.
 
 Then configure a resource:
 
