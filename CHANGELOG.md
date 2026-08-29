@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.0.1 - 2026-08-29
+
 - Make the package a framework-neutral Core adapter library. Symfony Bundle and
   dependency-injection integration now ship from `sohophp/sofinder-symfony`
   under the existing class names.
