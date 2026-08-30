@@ -8,8 +8,8 @@ minor=${requested#*.}
 minor=${minor%%.*}
 
 if [ "${PHP_BIN:-}" != "" ]; then
-    if ! "$PHP_BIN" -r 'exit(PHP_VERSION_ID >= 80200 ? 0 : 1);' >/dev/null 2>&1; then
-        echo 'PHP_BIN must point to PHP 8.2 or newer.' >&2
+    if ! "$PHP_BIN" -r 'exit(PHP_VERSION_ID >= 80100 ? 0 : 1);' >/dev/null 2>&1; then
+        echo 'PHP_BIN must point to PHP 8.1 or newer.' >&2
         exit 1
     fi
     exec "$PHP_BIN" "$@"

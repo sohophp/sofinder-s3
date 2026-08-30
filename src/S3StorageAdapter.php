@@ -17,17 +17,17 @@ use SohoPHP\SoFinder\Value\ListQuery;
 use SohoPHP\SoFinder\Value\ListingPage;
 use SohoPHP\SoFinder\Value\StorageCapabilities;
 
-final readonly class S3StorageAdapter implements StorageAdapterInterface, StorageUsageProviderInterface, StorageAuditProviderInterface, StorageHealthProbeInterface
+final class S3StorageAdapter implements StorageAdapterInterface, StorageUsageProviderInterface, StorageAuditProviderInterface, StorageHealthProbeInterface
 {
-    private string $prefix;
+    private readonly string $prefix;
 
     public function __construct(
-        private S3GatewayInterface $gateway,
+        private readonly S3GatewayInterface $gateway,
         string $root,
-        private string $baseUrl = '',
-        private int $maxRecursiveItems = 10_000,
-        private bool $secureEndpoint = true,
-        private PathGuard $paths = new PathGuard(),
+        private readonly string $baseUrl = '',
+        private readonly int $maxRecursiveItems = 10_000,
+        private readonly bool $secureEndpoint = true,
+        private readonly PathGuard $paths = new PathGuard(),
     ) {
         $this->prefix = $root === '/' ? '' : $this->paths->normalize($root);
     }

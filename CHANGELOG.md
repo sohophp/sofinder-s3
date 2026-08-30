@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+## 1.2.0 - 2026-08-30
+
+- Add PHP 8.1 support while preserving the adapter's readonly property
+  semantics and retaining compatibility with newer PHP runtimes.
+
 ## 1.1.2 - 2026-08-30
 
 - Synchronize the package version with the picker resource-boundary patch;

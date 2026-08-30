@@ -11,12 +11,12 @@ use SohoPHP\SoFinder\Exception\ConflictException;
 use SohoPHP\SoFinder\Exception\NotFoundException;
 use SohoPHP\SoFinder\Exception\SoFinderException;
 
-final readonly class AwsS3Gateway implements S3GatewayInterface
+final class AwsS3Gateway implements S3GatewayInterface
 {
     public function __construct(
-        private S3Client $client,
-        private string $bucket,
-        private bool $conditionalWrites = true,
+        private readonly S3Client $client,
+        private readonly string $bucket,
+        private readonly bool $conditionalWrites = true,
     ) {
     }
 

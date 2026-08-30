@@ -4,6 +4,8 @@ This optional framework-neutral library adds an `s3` storage adapter to
 SoFinder through AWS SDK for PHP v3. Installing it by itself does not install
 Symfony or another full-stack framework.
 
+The adapter supports PHP 8.1–8.5.
+
 ```bash
 composer require sohophp/sofinder-s3:^1.0
 ```
