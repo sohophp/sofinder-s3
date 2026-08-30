@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+## 1.1.2 - 2026-08-30
+
+- Synchronize the package version with the picker resource-boundary patch;
+  the S3 adapter runtime is unchanged.
+
 ## 1.1.1 - 2026-08-30
 
 - Synchronize the package version with the PHP 8 patch release; the S3 adapter
