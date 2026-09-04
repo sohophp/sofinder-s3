@@ -112,3 +112,10 @@ after performing its normal existence check. AWS S3 and MinIO retain atomic
 conditional creation. Other compatible providers can set
 `options.conditional_writes: false` explicitly when they have the same API
 limitation; disabling it introduces a small concurrent-create race window.
+
+The weekly **Storage provider compatibility** workflow runs the public adapter
+contract against a fresh MinIO service and against AWS S3, Cloudflare R2 and
+Backblaze B2 when their complete repository secret sets are configured. External
+jobs must use a dedicated non-production bucket and least-privilege credentials.
+For versioned buckets, include permission to list and delete object versions so
+the randomized contract prefix can be removed completely.

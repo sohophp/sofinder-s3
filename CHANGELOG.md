@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+## 1.3.0 - 2026-09-04
+
+- Run the public storage adapter contract against MinIO every week and against
+  configured AWS S3, Cloudflare R2 and Backblaze B2 test resources.
+
 ## 1.2.0 - 2026-08-30
 
 - Add PHP 8.1 support while preserving the adapter's readonly property
